@@ -9,10 +9,16 @@ if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir, { recursive: true });
 }
 
-async function takeScreenshot(driver, testTitle) {
+const filePathSepRegex = /[/\\]/;
+const filePathRemovedChars = /[\\/:*?"<>|]+/g;
+
+async function takeScreenshot(driver, file, parentTitle, testTitle) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const sanitizedTitle = testTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-  const filename = `${sanitizedTitle}_${timestamp}.png`;
+  const fileName = file.split(filePathSepRegex).at(-1);
+  const sanitizedTitleParentTitle = parentTitle.replaceAll(filePathRemovedChars, "");
+  const sanitizedTitle = testTitle.replaceAll(filePathRemovedChars, "");
+
+  const filename = `${fileName}_${sanitizedTitleParentTitle}_${sanitizedTitle}_${timestamp}.png`;
   const filepath = path.join(screenshotsDir, filename);
   
   try {
@@ -41,7 +47,7 @@ describe("Example Test Suite 1", function() {
   afterEach(async function() {
     // Take screenshot on test failure
     if (this.currentTest.state === 'failed') {
-      await takeScreenshot.call(this, driver, this.currentTest.title);
+      await takeScreenshot.call(this, driver, this.currentTest.file, this.currentTest.parent.title, this.currentTest.title);
     }
   });
 

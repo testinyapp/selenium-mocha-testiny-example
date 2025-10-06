@@ -1,9 +1,5 @@
 name: Selenium Tests (Mochawesome)
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+on: workflow_dispatch
 jobs:
   test:
     timeout-minutes: 10
@@ -23,4 +19,4 @@ jobs:
       if: ${{ !cancelled() }}
       env: 
         TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
-      run: npx @testiny/cli automation --project 57 --source selenium-tests --mochawesome mochawesome-report/*.json 
+      run: npx @testiny/cli automation --project 57 --source selenium-tests --mochawesome --attachment-path mochawesome-report/screenshots mochawesome-report/*.json 
